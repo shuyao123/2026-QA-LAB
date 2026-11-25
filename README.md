@@ -56,7 +56,7 @@ QA Lab 包含兩個獨立練習專案。入口是 `dist/index.html#projects`。
 node --test tests/checkout.test.cjs
 ```
 
-修正前模擬版本包含運費、優惠、購物車與訂單驗證問題。29 個網頁案例會各自指出實際值與預期值的差異，修正前為 0／29 通過，修正後為 29／29 通過。可用 CLI 驗證同一組案例。
+修正前預期 13 個缺陷對應的案例失敗。瀏覽器結果為 16／29 通過，可用 CLI 驗證同一組缺陷。
 
 ```powershell
 $env:QA_VERSION = 'legacy'
