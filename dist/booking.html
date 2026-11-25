@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7fc">
+  <meta name="description" content="QA Lab 第二個專案。操作預約 API、重現重複預約與取消問題，查看原始 HTTP 回應及回歸測試。">
+  <title>預約系統 API 測試｜QA Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="booking.css">
+  <script defer src="booking.js"></script>
+  <script defer src="booking-app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="header-inner shell">
+      <div class="brand-lockup">
+        <a class="wordmark" href="index.html#projects" aria-label="QA Lab 首頁"><span class="brand-icon" aria-hidden="true">✓</span> QA Lab<span class="brand-caption">測試作品集</span></a>
+        <span class="release-version"><span class="sr-only">作品集版本 </span>v1.0.0</span>
+      </div>
+      <nav aria-label="主要導覽">
+        <a href="index.html#projects">作品</a>
+        <a href="#api-defects">缺陷</a>
+        <a href="#api-tests">案例</a>
+        <a class="nav-demo" href="#api-lab">API 實驗室</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="shell">
+    <section class="hero api-hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="hero-context"><span></span> QA 作品集 · 模擬預約</p>
+        <h1 id="hero-title">預約系統<br><em>API 測試</em></h1>
+        <p class="hero-description">用 HTTP 狀態、回應本文和時段狀態驗證預約流程。從重複預約到取消釋位，逐步比對修正前後的回應。</p>
+        <div class="hero-actions">
+          <a class="button button-violet" href="#api-lab">操作 API 實驗室</a>
+          <a class="button button-outline" href="#api-tests">查看測試案例</a>
+        </div>
+      </div>
+      <div class="api-hero-panel">
+        <div class="api-hero-code">
+          <div class="api-route"><span>POST</span> /api/bookings</div>
+          <pre class="api-sample"><code>{
+  "slotId": "SLOT-1000",
+  "customer": "測試訪客"
+}</code></pre>
+          <p class="api-sample-label">同一時段的第二次請求</p>
+          <div class="api-sample-results">
+            <div><span>修正前</span><strong class="api-sample-old">201 Created</strong></div>
+            <div><span>修正後</span><strong class="api-sample-new">409 Conflict</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <dl class="metrics" aria-label="預約 API 回歸摘要">
+      <div class="metric"><dt>可重現缺陷</dt><dd>3</dd></div>
+      <div class="metric metric-version metric-legacy"><dt>修正前通過</dt><dd id="api-legacy">—</dd></div>
+      <div class="metric metric-version metric-fixed"><dt>修正後通過</dt><dd id="api-fixed">—</dd></div>
+    </dl>
+    <section class="section" id="api-defects" aria-labelledby="api-defects-title">
+      <div class="section-head">
+        <div><p class="eyebrow">DEFECT REPORTS</p><h2 id="api-defects-title">可重現的 API 缺陷</h2></div>
+        <p>各缺陷使用獨立的預約資料。載入後切換版本，可用同一組請求查看回應和預約狀態差異。</p>
+      </div>
+      <div class="strategy-grid api-defect-grid" id="api-defect-list"></div>
+    </section>
+    <section class="section" id="api-lab" aria-labelledby="api-lab-title">
+      <div class="section-head">
+        <div><p class="eyebrow">REQUEST WORKBENCH</p><h2 id="api-lab-title" tabindex="-1">API 實驗室</h2></div>
+        <p>自訂方法、路徑與 JSON。此網頁在瀏覽器本機執行模擬 API，回應保留狀態碼、標頭和原始 JSON 欄位。</p>
+      </div>
+      <div class="lab-frame">
+        <div class="lab-toolbar">
+          <strong id="api-scenario-name" class="lab-scenario">查詢可預約時段</strong>
+          <div class="lab-actions">
+            <fieldset class="segments" id="api-lab-versions">
+              <legend class="sr-only">API 實驗室版本</legend>
+              <label><input type="radio" name="api-lab-version" value="legacy"><span>修正前</span></label>
+              <label><input type="radio" name="api-lab-version" value="fixed" checked><span>修正後</span></label>
+            </fieldset>
+            <button id="api-reset" class="text-button" type="button">重設模擬資料</button>
+          </div>
+        </div>
+        <div class="presets" aria-label="預設請求">
+          <button type="button" class="button button-outline" data-preset="list">查詢時段</button>
+          <button type="button" class="button button-outline" data-preset="create">填入建立預約</button>
+          <button type="button" class="button button-outline" data-preset="read">填入查詢預約</button>
+          <button type="button" class="button button-outline" data-preset="cancel">填入取消預約</button>
+        </div>
+        <div class="api-workbench">
+          <form class="api-form" id="request-form">
+            <h3>請求</h3>
+            <div class="request-route">
+              <div><label for="request-method">方法</label><select id="request-method"><option>GET</option><option>POST</option><option>DELETE</option></select></div>
+              <div><label for="request-path">路徑</label><input id="request-path" type="text" required maxlength="150" value="/api/slots" spellcheck="false" autocomplete="off"></div>
+            </div>
+            <div id="request-body-field" hidden>
+              <label for="request-body">JSON 本文</label>
+              <textarea id="request-body" rows="6" spellcheck="false" maxlength="4000"></textarea>
+            </div>
+            <button class="button button-violet" type="submit">送出請求</button>
+            <p class="request-message" id="request-message" role="status"></p>
+          </form>
+          <div class="api-response">
+            <div class="api-response-head"><h3>回應</h3><span id="response-status" class="http-badge" role="status">待執行</span></div>
+            <div class="response-headers" id="response-headers"></div>
+            <pre id="response-body" tabindex="0" aria-label="回應本文">選擇情境或送出請求。</pre>
+          </div>
+        </div>
+        <div class="trace-panel">
+          <div class="api-response-head"><h3>請求紀錄</h3><span id="trace-count" role="status"></span></div>
+          <ol id="request-trace"></ol>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="api-tests" aria-labelledby="api-tests-title">
+      <div class="section-head">
+        <div><p class="eyebrow">TEST EXECUTION</p><h2 id="api-tests-title">預約 API 回歸案例</h2></div>
+        <p>驗證 HTTP 合約、同時預約的衝突處理、取消後的狀態轉移，以及錯誤輸入。</p>
+      </div>
+      <div class="case-board">
+        <div class="case-toolbar">
+          <fieldset class="segments" id="api-case-versions">
+            <legend class="sr-only">預約回歸版本</legend>
+            <label><input type="radio" name="api-case-version" value="legacy" checked><span>修正前</span></label>
+            <label><input type="radio" name="api-case-version" value="fixed"><span>修正後</span></label>
+          </fieldset>
+          <div class="case-filters">
+            <label class="sr-only" for="api-filter">篩選測試結果</label>
+            <select id="api-filter"><option value="all">全部結果</option><option value="failed">只看失敗</option><option value="passed">只看通過</option></select>
+            <button class="button button-violet" id="api-run" type="button">重新執行</button>
+          </div>
+        </div>
+        <p class="run-summary" id="api-run-summary" role="status"></p>
+        <div class="table-wrap"><table>
+          <thead><tr><th scope="col">案例</th><th scope="col" class="category-col">類型</th><th scope="col">結果</th></tr></thead>
+          <tbody id="api-case-rows"></tbody>
+        </table></div>
+        <div class="case-footer"><button class="button button-outline" id="api-export" type="button">下載執行報告（JSON）</button></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer shell"><div><strong>QA Lab</strong><span>個人練習專案 · 預約 API 與回歸測試</span></div><a href="index.html#projects">回到專案列表</a></footer>
+  <dialog id="api-case-dialog" aria-labelledby="api-case-title">
+    <form method="dialog" class="dialog-top"><button class="button button-outline" type="submit" autofocus>關閉</button></form>
+    <div id="api-case-content"></div>
+  </dialog>
+  <noscript>請啟用 JavaScript 來操作 API 實驗室與回歸測試。</noscript>
+</body>
+</html>

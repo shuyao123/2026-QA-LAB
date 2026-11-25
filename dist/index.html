@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7fc">
+  <meta name="description" content="QA Lab 軟體測試作品集。探索電商結帳與預約系統 API 兩個專案，重現缺陷並查看回歸證據。">
+  <title>QA Lab｜軟體測試作品集</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="checkout.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="header-inner shell">
+      <div class="brand-lockup">
+        <a class="wordmark" href="#projects" aria-label="QA Lab 首頁"><span class="brand-icon" aria-hidden="true">✓</span> QA Lab<span class="brand-caption">測試作品集</span></a>
+        <span class="release-version"><span class="sr-only">作品集版本 </span>v1.0.0</span>
+      </div>
+      <nav aria-label="主要導覽">
+        <a href="#strategy">策略</a>
+        <a href="#defect">缺陷</a>
+        <a href="#cases">案例</a>
+        <a class="nav-demo" href="#lab">互動實驗室</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="shell">
+    <section class="project-picker" id="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">測試專案</h2>
+      <div class="project-options">
+        <a class="project-option project-current" href="#top" aria-current="true">
+          <span class="project-icon" aria-hidden="true">✓</span><span><strong>電商結帳品質驗證</strong><small>介面測試 · 商業規則 · 缺陷回歸</small></span>
+        </a>
+        <a class="project-option" href="booking.html">
+          <span class="project-icon project-api-icon" aria-hidden="true">{ }</span><span><strong>預約系統 API 測試</strong><small>HTTP 合約 · 時段衝突 · 狀態轉移</small></span>
+        </a>
+      </div>
+    </section>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="hero-context"><span></span> QA 作品集 · 模擬電商</p>
+        <h1 id="hero-title">電商結帳<br><em>品質驗證</em></h1>
+        <p class="hero-description">從購物車到付款、下單與取消，親手重現 13 個缺陷，再用同一組資料驗證修正結果。</p>
+        <div class="hero-actions">
+          <a class="button button-violet" href="#lab">試玩模擬商店</a>
+          <a class="button button-outline" href="#defect">查看缺陷回報</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img class="hero-photo" src="commerce-studio.webp" alt="模擬商店的帆布包、拉鍊收納袋和霧面隨行瓶" width="1200" height="900" fetchpriority="high">
+        <div class="hero-photo-caption">購物車 · 優惠券 · 配送 · 模擬下單</div>
+      </div>
+    </section>
+    <dl class="metrics" aria-label="版本測試摘要">
+      <div class="metric"><dt>可重現缺陷</dt><dd id="hero-defects">—</dd></div>
+      <div class="metric metric-version metric-legacy"><dt>修正前通過</dt><dd id="hero-legacy">—</dd></div>
+      <div class="metric metric-version metric-fixed"><dt>修正後通過</dt><dd id="hero-fixed">—</dd></div>
+    </dl>
+    <section id="strategy" class="section" aria-labelledby="strategy-title">
+      <div class="section-head">
+        <div><p class="eyebrow">TEST STRATEGY</p><h2 id="strategy-title">先測交易風險</h2></div>
+        <p>優先檢查金額、可售數量和出單條件，再驗證輸入格式與提示。案例執行結果來自結帳和下單的邏輯層。</p>
+      </div>
+      <div class="strategy-grid">
+        <article class="strategy-card"><span class="strategy-icon" aria-hidden="true">％</span><h3>金額與配送</h3><p>比對折扣與免運門檻，驗證宅配、超商取貨的運費和最終應付金額。</p><span class="method">決策表 · 門檻值</span></article>
+        <article class="strategy-card"><span class="strategy-icon" aria-hidden="true">▤</span><h3>商品與優惠</h3><p>檢查單品庫存、空購物車、優惠碼大小寫和最低消費。</p><span class="method">邊界值 · 等價類別</span></article>
+        <article class="strategy-card"><span class="strategy-icon" aria-hidden="true">✓</span><h3>付款與訂單</h3><p>驗證付款被拒、重複送單及取消回補，核對訂單狀態與庫存。</p><span class="method">負向測試 · 狀態轉移</span></article>
+      </div>
+    </section>
+    <section id="defect" class="section" aria-labelledby="defect-title">
+      <div class="section-head">
+        <div><p class="eyebrow">DEFECT REPORTS</p><h2 id="defect-title">缺陷回報</h2></div>
+        <p>展開缺陷查看重現步驟、預期與實際結果，以及連結的回歸案例。</p>
+      </div>
+      <div class="defect-toolbar">
+        <p id="defect-summary" role="status"></p>
+        <label class="sr-only" for="defect-filter">篩選缺陷模組</label>
+        <select id="defect-filter"><option value="all">所有缺陷模組</option></select>
+      </div>
+      <div class="defect-list" id="defect-list"></div>
+    </section>
+    <section id="lab" class="section" aria-labelledby="lab-title">
+      <div class="section-head">
+        <div><p class="eyebrow">CHECKOUT SANDBOX</p><h2 id="lab-title" tabindex="-1">互動實驗室</h2></div>
+        <p>增減商品、套用優惠、選擇配送，並模擬付款與訂單操作。同一組輸入與操作會在切換版本時重跑。</p>
+      </div>
+      <div class="lab-frame">
+        <div class="lab-toolbar">
+          <div class="lab-scenario" id="active-scenario">自訂購物車</div>
+          <div class="lab-actions">
+            <fieldset class="segments" id="lab-versions">
+              <legend class="sr-only">結帳實驗室版本</legend>
+              <label><input type="radio" name="lab-version" value="legacy"><span>修正前</span></label>
+              <label><input type="radio" name="lab-version" value="fixed" checked><span>修正後</span></label>
+            </fieldset>
+            <button type="button" class="text-button" id="reset-lab">重設情境</button>
+          </div>
+        </div>
+        <form class="lab-grid" id="checkout-form" novalidate>
+          <div class="lab-inputs">
+            <section aria-labelledby="cart-title">
+              <div class="form-heading"><h3 id="cart-title">購物車</h3><span class="item-count" id="item-count"></span></div>
+              <div id="products"></div>
+            </section>
+            <section class="form-block" aria-labelledby="checkout-title">
+              <h3 id="checkout-title">優惠與配送</h3>
+              <div class="field-grid">
+                <div><label for="coupon">優惠碼</label><div class="input-action"><input id="coupon" type="text" maxlength="30" placeholder="輸入優惠碼" spellcheck="false" autocomplete="off"><button type="button" class="button button-outline" id="apply-coupon">套用</button></div></div>
+                <div><label for="delivery">配送方式</label><select id="delivery"><option value="home">宅配到府</option><option value="pickup">超商取貨</option><option value="island">離島宅配</option></select></div>
+              </div>
+              <p class="field-help">單筆限購 8 件。小計滿 NT$500 可用 DEMO100 折 NT$100。本島宅配 NT$80，折後滿 NT$700 免運。超商取貨 NT$60，離島宅配 NT$140。</p>
+            </section>
+            <section class="form-block" aria-labelledby="order-title">
+              <div class="form-heading"><h3 id="order-title">模擬收件資料</h3><button type="button" class="text-button" id="fill-customer">填入示範資料</button></div>
+              <div class="field-grid">
+                <div><label for="customer-name">收件人</label><input id="customer-name" type="text" maxlength="40" autocomplete="off" placeholder="測試使用者"></div>
+                <div><label for="customer-phone">手機號碼</label><input id="customer-phone" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="0900000000"></div>
+              </div>
+              <div class="payment-field"><label for="payment">模擬付款結果</label><select id="payment"><option value="approved">付款成功</option><option value="declined">付款遭拒</option></select></div>
+              <p class="field-help">請使用示範資料。變更購物車或收件資料會開始新的模擬結帳。</p>
+            </section>
+          </div>
+          <div class="receipt-panel">
+            <div id="receipt" aria-live="polite" aria-atomic="true"></div>
+            <button type="submit" class="button button-violet order-button">送出模擬訂單</button>
+            <button type="button" class="button button-outline cancel-button" id="cancel-order" disabled>取消最近的訂單</button>
+            <div id="order-result" role="status" aria-atomic="true"></div>
+          </div>
+        </form>
+      </div>
+    </section>
+    <section id="cases" class="section" aria-labelledby="cases-title">
+      <div class="section-head">
+        <div><p class="eyebrow">TEST EXECUTION</p><h2 id="cases-title">回歸測試案例</h2></div>
+        <p>依模組或結果篩選，查看每個案例的測試輸入與逐項比對。可下載所選版本的完整 JSON 報告。</p>
+      </div>
+      <div class="case-board">
+        <div class="case-toolbar">
+          <fieldset class="segments" id="case-versions">
+            <legend class="sr-only">測試案例版本</legend>
+            <label><input type="radio" name="case-version" value="legacy" checked><span>修正前</span></label>
+            <label><input type="radio" name="case-version" value="fixed"><span>修正後</span></label>
+          </fieldset>
+          <div class="case-filters">
+            <label class="sr-only" for="module-filter">篩選模組</label>
+            <select id="module-filter"><option value="all">所有模組</option></select>
+            <label class="sr-only" for="filter">篩選結果</label>
+            <select id="filter"><option value="all">全部結果</option><option value="failed">只看失敗</option><option value="passed">只看通過</option></select>
+            <button class="button button-violet" type="button" id="run">重新執行</button>
+          </div>
+        </div>
+        <p class="run-summary" id="run-summary" role="status"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">案例</th><th scope="col" class="category-col">模組</th><th scope="col" class="priority-col">優先級</th><th scope="col">結果</th></tr></thead>
+            <tbody id="case-rows"></tbody>
+          </table>
+        </div>
+        <div class="case-footer"><button type="button" class="button button-outline" id="export">下載執行報告（JSON）</button></div>
+      </div>
+    </section>
+  </main>
+  <footer class="shell site-footer">
+    <div><strong>QA Lab</strong><span>個人練習專案 · 模擬電商規則與本機訂單驗證</span></div>
+    <a href="#top">回到頂端</a>
+  </footer>
+  <dialog id="case-dialog" aria-labelledby="dialog-title">
+    <form method="dialog" class="dialog-top"><button class="button button-outline" type="submit" autofocus>關閉</button></form>
+    <div id="dialog-content"></div>
+  </dialog>
+  <noscript>請啟用 JavaScript 來執行測試案例與互動示範。</noscript>
+</body>
+</html>
