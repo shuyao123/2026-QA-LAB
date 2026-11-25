@@ -1,0 +1,10 @@
+{
+  "name": "qa-lab-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/checkout.test.cjs tests/booking.test.cjs",
+    "test:booking": "node --test tests/booking.test.cjs",
+    "booking:api": "node booking-server.cjs"
+  }
+}
