@@ -46,7 +46,7 @@ const defects = {
     impact: "可售數量不足時仍可出單，可能造成超賣。",
     steps: ["將購物車清空，再加入拉鍊收納袋。", "把收納袋數量調為 4 件。", "確認結帳明細是否阻擋此數量。"],
     fields: ["error"],
-    cause: "舊版缺少商品庫存檢查。新版依商品逐一比對其可售庫存。"
+    cause: "舊版只比對共通購買上限 5 件。新版依商品逐一檢查其可售庫存。"
   },
   "BUG-03": {
     title: "小寫優惠碼被判為無效",
@@ -67,7 +67,7 @@ const defects = {
     impact: "配送時缺少必要的聯絡資料。",
     steps: ["加入日常帆布包 1 件。", "填入測試收件人，保留手機號碼空白。", "送出模擬訂單，查看驗證結果。"],
     fields: ["orderStatus"],
-    cause: "舊版缺少手機欄位驗證。新版會檢查手機格式並阻擋不符合規則的訂單。"
+    cause: "舊版只檢查收件人姓名。新版另驗證手機號碼格式，不符合規則時阻擋出單。"
   },
   "BUG-06": {
     title: "小計正好 NT$500，無法使用滿額優惠",
@@ -78,7 +78,7 @@ const defects = {
   },
   "BUG-07": {
     title: "已過期的優惠碼仍可折抵",
-    impact: "已結束的活動仍對符合情境的訂單折抵 NT$100。",
+    impact: "已結束的活動使每筆符合情境的訂單少收 NT$100。",
     steps: ["加入日常帆布包 2 件和拉鍊收納袋 1 件。", "套用已過期的 EXPIRED100。", "檢查折抵金額與優惠狀態。"],
     fields: ["couponStatus", "discount"],
     cause: "舊版辨識到活動代碼就進行折抵。修正後，會先確認活動狀態。"
@@ -389,10 +389,9 @@ function renderReceipt() {
     ["商品小計", money(result.subtotal)],
     ["優惠折抵", result.discount ? "−" + money(result.discount) : money(0)],
     ["折扣後小計", money(result.discountedSubtotal)],
-    [deliveryNames[result.delivery] + "運費", money(result.shipping)]
+    [deliveryNames[result.delivery] + "運費", money(result.shipping)],
+    ["應付金額", money(result.total)]
   ];
-  if (result.handlingFee) entries.push(["處理費", money(result.handlingFee)]);
-  entries.push(["應付金額", money(result.total)]);
   entries.forEach(([label, value], index) => {
     const line = element("div", index === entries.length - 1 ? "receipt-total" : "");
     line.append(element("dt", "", label), element("dd", "", value));

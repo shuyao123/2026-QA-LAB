@@ -15,12 +15,11 @@
   function checkout(input, version = "fixed", stock = initialStock) {
     const legacy = version === "legacy";
     const quantities = products.map(product => input[product.key] === undefined ? 0 : input[product.key]);
-    const quantityLimit = legacy ? 6 : 5;
-    if (quantities.some(quantity => !Number.isInteger(quantity) || quantity < 0 || quantity > quantityLimit)) {
+    if (quantities.some(quantity => !Number.isInteger(quantity) || quantity < 0 || quantity > 5)) {
       return { error: "QUANTITY_OUT_OF_RANGE" };
     }
     const itemCount = quantities.reduce((total, quantity) => total + quantity, 0);
-    if (!legacy && itemCount === 0) return { error: "EMPTY_CART" };
+    if (itemCount === 0) return { error: "EMPTY_CART" };
     if (!legacy && products.some((product, index) => quantities[index] > stock[product.key])) {
       return { error: "OUT_OF_STOCK" };
     }
@@ -39,33 +38,26 @@
     } else if (preferredCode === couponCode || preferredCode === expiredCoupon) {
       const meetsMinimum = legacy ? subtotal > 500 : subtotal >= 500;
       couponStatus = meetsMinimum ? "APPLIED" : "MINIMUM_NOT_MET";
-      if (legacy && subtotal < 500) couponStatus = "INVALID";
       discount = meetsMinimum ? 100 : 0;
-    } else if (coupon && (!legacy || [couponCode, expiredCoupon].includes(coupon.toUpperCase()))) {
+    } else if (coupon) {
       couponStatus = "INVALID";
     }
 
     const discountedSubtotal = subtotal - discount;
     const delivery = ["pickup", "island"].includes(input.delivery) ? input.delivery : "home";
-    // Legacy delivery uses the pre-discount subtotal and an exclusive threshold for regular home quotes.
+    // The legacy build passes the pre-discount amount to the home delivery rule.
     const shippingBase = legacy ? subtotal : discountedSubtotal;
-    const strictThreshold = legacy && delivery === "home" && discount === 0;
-    const freeShipping = strictThreshold ? shippingBase > 700 : shippingBase >= 700;
-    const homeRate = legacy && delivery === "home" ? 90 : 80;
-    let shipping = freeShipping ? 0 : homeRate;
+    let shipping = shippingBase >= 700 ? 0 : 80;
     if (delivery === "pickup") shipping = legacy ? 80 : 60;
     if (delivery === "island" && !legacy) shipping = 140;
-    const distinctProducts = quantities.filter(quantity => quantity > 0).length;
-    const handlingFee = legacy && distinctProducts > 1 ? 20 : 0;
-    const total = discountedSubtotal + shipping + handlingFee;
-    return { subtotal, discount, discountedSubtotal, couponStatus, delivery, shipping, handlingFee, total };
+    return { subtotal, discount, discountedSubtotal, couponStatus, delivery, shipping, total: discountedSubtotal + shipping };
   }
 
   function placeOrder(input, version = "fixed", stock = initialStock) {
     const quote = checkout(input, version, stock);
     if (quote.error) return { orderStatus: "BLOCKED", orderError: quote.error };
     const { name = "", phone = "" } = input.customer ?? {};
-    if (version !== "legacy" && !name.trim()) return { orderStatus: "BLOCKED", orderError: "NAME_REQUIRED" };
+    if (!name.trim()) return { orderStatus: "BLOCKED", orderError: "NAME_REQUIRED" };
     if (version !== "legacy" && !/^09\d{8}$/.test(phone.trim())) {
       return { orderStatus: "BLOCKED", orderError: "INVALID_PHONE" };
     }
@@ -85,7 +77,7 @@
       if (action.type === "cancel") {
         const order = orders.slice().reverse().find(candidate => !candidate.cancelled);
         if (!order) {
-          result = legacy ? { orderStatus: "CANCELLED" } : { orderStatus: "BLOCKED", orderError: "NO_ACTIVE_ORDER" };
+          result = { orderStatus: "BLOCKED", orderError: "NO_ACTIVE_ORDER" };
           continue;
         }
         order.cancelled = true;
