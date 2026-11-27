@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f7fc">
+  <meta name="theme-color" content="#0c0d12">
   <meta name="description" content="QA Lab 第二個專案。操作預約 API、重現重複預約與取消問題，查看原始 HTTP 回應及回歸測試。">
   <title>預約系統 API 測試｜QA Lab</title>
   <link rel="stylesheet" href="style.css">
@@ -20,7 +20,7 @@
         <span class="release-version"><span class="sr-only">作品集版本 </span>v1.0.0</span>
       </div>
       <nav aria-label="主要導覽">
-        <a href="index.html#projects">作品</a>
+        <a href="#projects">作品</a>
         <a href="#api-defects">缺陷</a>
         <a href="#api-tests">案例</a>
         <a class="nav-demo" href="#api-lab">API 實驗室</a>
@@ -28,6 +28,17 @@
     </div>
   </header>
   <main id="main" class="shell">
+    <section class="project-picker" id="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">測試專案</h2>
+      <div class="project-options">
+        <a class="project-option" href="index.html#projects">
+          <span class="project-icon" aria-hidden="true">✓</span><span><strong>電商結帳品質驗證</strong><small>介面測試 · 商業規則 · 缺陷回歸</small></span>
+        </a>
+        <a class="project-option project-current" href="#top" aria-current="true">
+          <span class="project-icon project-api-icon" aria-hidden="true">{ }</span><span><strong>預約系統 API 測試</strong><small>HTTP 合約 · 時段衝突 · 狀態轉移</small></span>
+        </a>
+      </div>
+    </section>
     <section class="hero api-hero" id="top" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="hero-context"><span></span> QA 作品集 · 模擬預約</p>
